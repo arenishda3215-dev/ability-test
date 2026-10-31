@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>能力100項目診断</title>
+<style>
+:root{--bg:#faf8f4;--fg:#222;--mut:#777;--card:#fff;--ac:#c4562f;--bd:#e5e0d6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1b19;--fg:#eee;--mut:#aaa;--card:#2a2724;--ac:#e8845f;--bd:#3d3935}}
+:root[data-theme="dark"]{--bg:#1d1b19;--fg:#eee;--mut:#aaa;--card:#2a2724;--ac:#e8845f;--bd:#3d3935}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,"Hiragino Sans","Noto Sans JP",sans-serif}
+main{max-width:560px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.5rem;margin:.5em 0}h2{font-size:1.1rem;margin:1.4em 0 .5em}
+.mut{color:var(--mut);font-size:.9rem}
+button{font:inherit;color:inherit;cursor:pointer}
+.opt{display:block;width:100%;margin:8px 0;padding:13px;border:1px solid var(--bd);border-radius:12px;background:var(--card);text-align:center}
+.opt:hover{border-color:var(--ac)}
+.go{background:var(--ac);color:#fff;border:0;border-radius:12px;padding:13px 28px;font-weight:700}
+.bar{height:6px;background:var(--bd);border-radius:3px;margin:8px 0 22px}.bar i{display:block;height:100%;background:var(--ac);border-radius:3px}
+.q{font-size:1.2rem;font-weight:600;min-height:4.2em}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin:10px 0}
+details{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:8px 14px;margin:8px 0}
+summary{cursor:pointer;font-weight:600}
+.row{display:grid;grid-template-columns:1fr 90px 24px;gap:8px;align-items:center;font-size:.88rem}
+.row b{display:block;height:8px;background:var(--bd);border-radius:4px;overflow:hidden}.row b i{display:block;height:100%;background:var(--ac)}
+.row span:last-child{text-align:right}
+svg text{fill:var(--fg);font-size:10.5px}
+</style></head><body><main id="app"></main>
+<script>
+const CAT="身体能力|感覚・知覚|知的能力|創造・発想|器用さ・技能|メンタル・感情|性格・気質|対人・社会性|実行・マネジメント|価値観・人間性".split("|");
+const AB=("筋力|持久力|瞬発力|柔軟性|バランス感覚|敏捷性|回復力|健康体質・免疫|睡眠の質|暑さ・寒さ・痛みへの耐性|"+
+"視力|聴力|嗅覚|味覚|触覚|色彩感覚|音感・リズム感|空間把握能力|方向感覚|動体視力|"+
+"論理的思考力|記憶力|理解力|数的処理能力|言語能力|抽象化能力|分析力|集中力|学習速度|情報処理速度|"+
+"発想力|想像力|美的センス|表現力|構想力|思考の柔軟性|問題発見力|ユーモア|物語構成力|工夫・改善力|"+
+"手先の器用さ|身体操作の巧みさ|工作・手工芸|機械・機器操作|道具の扱い|運転・操縦|料理|描画・造形|楽器演奏|修理・メンテナンス|"+
+"感情の安定性|ストレス耐性|自己肯定感|楽観性|立ち直り力|衝動抑制|不安への対処力|忍耐力|感情認識力|自己理解|"+
+"誠実さ|好奇心|勇気|責任感|協調性|外向性|開放性|粘り強さ|慎重さ|決断力|"+
+"共感力|傾聴力|説得力|交渉力|リーダーシップ|信頼構築力|対立調整力|社交性|気配り|魅力・カリスマ性|"+
+"計画力|時間管理|実行力|優先順位づけ|自己管理|段取り力|継続力|判断力|危機対応力|環境適応力|"+
+"倫理観|思いやり|謙虚さ|公平性|自律性|目的意識|寛容さ|内省力|感謝する力|運・巡り合わせ").split("|");
+const QG=[
+["力仕事や長時間の運動でも、体力には自信がある","急に動く場面でも素早く反応でき、体も柔らかい","体のバランスを崩しにくく、身のこなしが軽い","疲れや風邪から回復するのが早く、体調を崩しにくい","よく眠れる方で、暑さ・寒さ・痛みにも強い"],
+["遠くの文字や小さな音の変化によく気づく","匂いや味の違いにすぐ気づく","手触りや色の微妙な違いがわかる","リズムや音程の感覚が良く、立体を頭の中で回すのも得意だ","初めての場所でも方向がわかり、動くものを目で追うのが得意だ"],
+["筋道立てて考えるのが得意で、覚えたことを長く忘れない","難しい説明も理解でき、計算やデータ処理も苦にならない","言葉で説明するのが得意で、具体例から共通点を見つけられる","物事を要素に分けて分析でき、長時間集中できる","新しいことの習得が速く、情報を素早くさばける"],
+["アイデアが次々浮かび、空想を広げるのが好きだ","見た目の美しさにこだわりがあり、自分を表現するのが好きだ","全体像を描くのが得意で、考えをすぐ切り替えられる","問題点によく気づき、人を笑わせるのも得意だ","話を組み立てて語るのが得意で、やり方を改善するのが好きだ"],
+["細かい手作業が得意で、体を思い通りに動かせる","工作やDIYが好きで、機械の操作もすぐ覚える","道具の扱いが上手く、運転や操縦も得意だ","料理をよくし、絵や造形も得意だ","楽器など技術を磨く趣味があり、壊れたものを直すのが好きだ"],
+["気持ちの浮き沈みが少なく、プレッシャーにも強い","自分に自信があり、物事を前向きに考える","失敗してもすぐ立ち直り、衝動的な行動は少ない","不安を上手くコントロールでき、我慢強い","自分や他人の感情に気づけ、自分のことをよく理解している"],
+["嘘やごまかしが嫌いで、知らないことに触れるのが好きだ","リスクがあっても挑戦でき、任された役割は必ず果たす","周りと合わせるのが得意で、人と過ごすと元気が出る","新しい考え方を受け入れ、一度始めたら粘り強く続ける","行動前によく考える慎重派だが、決めるときは迷わない"],
+["相手の気持ちに寄り添い、話を最後まで聞ける","自分の意見で人を動かしたり、条件の交渉をするのが得意だ","グループをまとめる役になりやすく、人から頼られる","もめごとの仲裁が得意で、初対面でも気軽に話せる","細かい気配りができ、人を惹きつける魅力があると言われる"],
+["計画を立てて動き、時間配分が上手い","思い立ったらすぐ行動でき、優先順位づけも上手い","生活や体調を自分で管理でき、物事の段取りが良い","習慣を長く続けられ、状況判断も的確だ","トラブルでも落ち着いて対処でき、新しい環境にすぐ馴染める"],
+["正しいと思うことは貫き、困っている人を放っておけない","自分の非を素直に認め、誰に対しても公平に接する","人に言われなくても自分で動け、人生の目的がはっきりしている","人の失敗に寛容で、自分の行動を振り返る習慣がある","感謝を言葉にすることが多く、チャンスをつかむのが上手い"]];
+const QX=[["疲れても一晩休めば、すぐ元に戻る","風邪や感染症にかかりにくい体質だ","寝つきが良く、朝までぐっすり眠れる","暑さ・寒さや痛みを我慢するのは得意な方だ"],
+["音楽を聴くと、リズムや音程のズレにすぐ気づく","頭の中で立体を回したり、地図を思い描くのが得意だ","初めての場所でも、自分がどちらを向いているかわかる","飛んでくるボールなど、動くものを目で追うのが得意だ"],
+["物事を要素に分けて、原因を突き止めるのが得意だ","一度集中すると、長時間そのことに没頭できる","新しいことを覚えるスピードが速い方だ","大量の情報を、素早く整理して処理できる"],
+["他の人が気づかない問題点によく気づく","冗談を言って、人を笑わせるのが得意だ","話や企画のストーリーを組み立てるのが得意だ","今のやり方をもっと良くする工夫を考えるのが好きだ"],
+["料理をするのが好きで、手際も良い方だ","絵を描いたり、ものを造形したりするのが得意だ","楽器など、練習して技術を磨く趣味がある","壊れたものを、自分で直そうとすることが多い"],
+["不安なときも、気持ちを落ち着かせる方法を持っている","つらいことでも、じっと我慢して耐えられる","相手や自分の感情の変化にすぐ気づく","自分の長所も短所も、よくわかっている"],
+["自分と違う考え方も、抵抗なく受け入れられる","一度始めたことは、簡単にはあきらめない","行動する前に、リスクをよく考える方だ","迷っても、最後はきっぱり決めることができる"],
+["意見がぶつかったとき、間に入ってまとめられる","初対面の人とでも、気軽に話せる","相手が困っていることに、よく気がつく","周りから「人を惹きつける魅力がある」と言われる"],
+["決めた習慣を、長く続けられる","状況を見て、的確に判断するのが得意だ","トラブルが起きても、落ち着いて対処できる","新しい環境や人間関係にも、すぐ馴染める"],
+["人の失敗や違いに対して、寛容でいられる","一日の終わりに、自分の行動を振り返る習慣がある","人に感謝の気持ちを、言葉で伝えることが多い","チャンスや良い出会いに恵まれやすい方だと思う"]];
+const NQ=70,PQ=[0,0,1,1,2,2,3,4,5,6];
+const Q=[];for(let j=0;j<7;j++)for(let c=0;c<10;c++)Q.push({c,t:j<3?QG[c][j]:QX[c][j-3]});
+const L=["当てはまる","少し当てはまる","わからない","少し当てはまらない","当てはまらない"],W=[1,.75,.5,.25,0];
+const app=document.getElementById("app");let ans=[];
+
+function start(){ans=[];app.innerHTML=`<h1>能力100項目診断</h1><p>70の質問に答えると、回答の傾向から<b>600点</b>を100項目（各最大10点）に配分します。ルールに基づく自動採点なので、Claudeのアカウントがなくてもご利用いただけます。最後にレーダーチャートで結果を表示します。</p><p class="mut">所要時間：約7分　／　直感で答えてください</p><button class="go" id="s">診断スタート</button>`;document.getElementById("s").onclick=ask}
+function ask(){const i=ans.length;if(i>=NQ)return finish();
+app.innerHTML=`<div class="mut">${i+1} / ${NQ}</div><div class="bar"><i style="width:${i*100/NQ}%"></i></div><div class="q">${Q[i].t}</div>`+L.map((l,k)=>`<button class="opt" data-k="${k}">${l}</button>`).join("");
+app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ans.push(+b.dataset.k);ask()})}
+
+function fit(raw){let v=raw.map(x=>Math.max(0,Math.min(10,Math.round(x))));let n=0;
+while(n++<2000){const d=600-v.reduce((a,b)=>a+b,0);if(!d)break;let bi=-1,bs=d>0?-1e9:1e9;
+v.forEach((x,i)=>{if(d>0&&x<10){const s=raw[i]-x;if(s>bs){bs=s;bi=i}}if(d<0&&x>0){const s=raw[i]-x;if(s<bs){bs=s;bi=i}}});
+if(bi<0)break;v[bi]+=d>0?1:-1}return v}
+const H=(a,b)=>{let x=(Math.imul(a+1,2654435761)+Math.imul(b+7,40503))>>>0;x^=x>>>13;x=Math.imul(x,1274126177)>>>0;return(x^(x>>>16))>>>0};
+const REL=[[5,8],[2,4],[3,8],[2,4],[0,1],[6,9],[5,7],[6,9],[2,5],[6,7]];
+const MAP=AB.map((_,a)=>{const c=Math.floor(a/10),k=a%10,j=PQ[k],n=j<6?j+1:j-1,f=H(a,1)%2;
+return[[j*10+c,.45],[n*10+c,.15],[(H(a,2)%7)*10+REL[c][f],.2],[(H(a,3)%7)*10+REL[c][1-f],.2]]});
+const BIAS=AB.map((_,a)=>((H(a,9)%100)/100-.5)*.14);
+function score(){
+const x=MAP.map((m,a)=>m.reduce((s,[i,w])=>s+w*(W[ans[i]]-.5),0)+BIAS[a]);
+const m=x.reduce((a,b)=>a+b,0)/100,sd=Math.sqrt(x.reduce((a,b)=>a+(b-m)**2,0)/100)||1;
+const w=x.map(v=>Math.exp(1.05*(v-m)/sd)),s=w.reduce((a,b)=>a+b,0);return w.map(v=>v*600/s)}
+const TY="アスリート|センサー|ロジシャン|クリエイター|職人|不屈のハート|個性派|コミュニケーター|プランナー|人格者".split("|");
+const TX=["体を動かして力を発揮する場面で本領を出せます。","五感や空間のセンスで、周りが見落とす違いに気づけます。","考えを整理し、本質を見抜くことで力を発揮します。","新しい発想を形にして、周囲を驚かせることができます。","手を動かして物事を形にする、確かな技術があります。","プレッシャー下でも心が折れにくく、立て直しが得意です。","はっきりした気質があり、自分らしいスタイルを貫けます。","人の気持ちを動かし、場をつなぐ力があります。","段取りと実行で、物事を着実に前へ進められます。","価値観が軸になっていて、人から信頼されやすいタイプです。"];
+function note(sc){const ca=CAT.map((_,c)=>sc.slice(c*10,c*10+10).reduce((a,b)=>a+b,0));
+const o=ca.map((v,i)=>[v,i]).sort((a,b)=>b[0]-a[0]||a[1]-b[1]),hi=o[0][1],h2=o[1][1],lo=o[9][1];
+const t=sc.map((v,i)=>[v,i]).sort((a,b)=>b[0]-a[0]||a[1]-b[1]).slice(0,3).map(e=>AB[e[1]]);
+const u=sc.map((v,i)=>[v,i]).sort((a,b)=>a[0]-b[0]||a[1]-b[1])[0][1];
+return `<b>あなたは「${TY[hi]}×${TY[h2]}」型</b><br>${TX[hi]}${TX[h2]}<br>特に強い項目：${t.join("・")}。伸びしろが大きいのは「${CAT[lo]}」で、中でも「${AB[u]}」は意識すると伸ばせそうです。`}
+function finish(){const sc=fit(score());show(sc,note(sc),true)}
+
+function show(sc,msg,ai){
+const ca=CAT.map((_,c)=>sc.slice(c*10,c*10+10).reduce((a,b)=>a+b,0)/10);
+const cx=170,cy=150,R=100,pt=(c,r)=>{const t=-Math.PI/2+2*Math.PI*c/10;return[cx+r*Math.cos(t),cy+r*Math.sin(t)]};
+const poly=r=>CAT.map((_,c)=>pt(c,r).join(",")).join(" ");
+let svg=`<svg viewBox="0 0 340 310" width="100%" role="img" aria-label="カテゴリ別レーダーチャート">`;
+[.25,.5,.75,1].forEach(g=>svg+=`<polygon points="${poly(R*g)}" fill="none" stroke="var(--bd)"/>`);
+CAT.forEach((n,c)=>{const[x,y]=pt(c,R),[lx,ly]=pt(c,R+16);svg+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--bd)"/><text x="${lx}" y="${ly+3}" text-anchor="${Math.abs(lx-cx)<8?"middle":lx>cx?"start":"end"}">${n}</text>`});
+svg+=`<polygon points="${ca.map((v,c)=>pt(c,R*v/10).join(",")).join(" ")}" fill="var(--ac)" fill-opacity=".3" stroke="var(--ac)" stroke-width="2"/></svg>`;
+const top=sc.map((v,i)=>[v,i]).sort((a,b)=>b[0]-a[0]||a[1]-b[1]).slice(0,5);
+const row=i=>`<div class="row"><span>${AB[i]}</span><b><i style="width:${sc[i]*10}%"></i></b><span>${sc[i]}</span></div>`;
+app.innerHTML=`<h1>診断結果</h1><p class="mut">合計 600 / 1000 点（各項目 最大10点）</p>`+svg+
+(msg?`<div class="card">${msg}</div>`:"")+`<h2>強み TOP5</h2><div class="card">${top.map(t=>row(t[1])).join("")}</div><h2>カテゴリ別の詳細</h2>`+
+CAT.map((n,c)=>`<details><summary>${n}　${ca[c].toFixed(1)}</summary>${Array.from({length:10},(_,k)=>row(c*10+k)).join("")}</details>`).join("")+
+`<p><button class="go" id="r">もう一度診断する</button></p>`;
+document.getElementById("r").onclick=start;window.scrollTo(0,0)}
+start();
+</script></body></html>
